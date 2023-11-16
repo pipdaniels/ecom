@@ -17,11 +17,11 @@ for (var i= 0; i< updateBtn.length; i++){
 function updateUserOrder(productId, action){
     console.log('User is logged in, Sending data ...')
     var url = '/update_item/'
-    fetch(url,{
-        method : 'POST',
+    fetch (url,{
+        method : "POST",
         headers : {
             'Content-Type': 'application/json',
-            'X-CSRFToken': 'csrftoken'
+            'X-CSRFToken': csrftoken,
         },
         body:JSON.stringify({'productId':productId, 'action':action})
     })
