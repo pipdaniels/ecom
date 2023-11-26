@@ -14,8 +14,8 @@
 			<input required class="form-control" type="email" name="email" placeholder="Email..">
 		</div>
             </div>
-            <div id="shipping-info">
-<hr>
+	<div id="shipping-info">
+		<hr>
 		<p>Shipping Information:</p>
 		<hr>
 		<div class="form-field">
@@ -30,36 +30,121 @@
 		<div class="form-field">
 			<input class="form-control" type="text" name="zipcode" placeholder="Zip code..">
 		</div>
-            </div>
+	</div>
             <hr>
             <input id="form-button" class="btn btn-success btn-block" type="submit" value="Continue">
 </form>
             <br>
 <div class="box-element hidden" id="payment-info">
 	<small>Paypal Options</small>
-</div>
-		</div>
+	<div>
+		<button id="make-payment" class="btn btn-success btn-block">Make Payment</button>
 	</div>
+</div>
+</div>
+</div>
 
 	<div class="col-lg-6">
 		<div class="box-element">
-	<a  class="btn btn-outline-dark" href="{% url 'cart' %}">&#x2190; Back to Cart</a>
-	<hr>
-	<h3>Order Summary</h3>
-	<hr>
-	{% for item in items %}
-	<div class="cart-row">
-		<div style="flex:2"><img class="row-image" src="{{item.product.image.url}}"></div>
-		<div style="flex:2"><p>{{item.product.name}}</p></div>
-		<div style="flex:1"><p>${{item.product.price}}</p></div>
-		<div style="flex:1"><p>x{{item.quantity}}</p></div>
-	</div>
-	{% endfor %}
-	<h5>Items:   {{order.get_cart_items}}</h5>
-	<h5>Total:   ${{order.get_cart_total}}</h5>
+		<a  class="btn btn-outline-dark" href="{% url 'cart' %}">&#x2190; Back to Cart</a>
+		<hr>
+		<h3>Order Summary</h3>
+		<hr>
+		{% for item in items %}
+		<div class="cart-row">
+			<div style="flex:2"><img class="row-image" src="{{item.product.image.url}}"></div>
+			<div style="flex:2"><p>{{item.product.name}}</p></div>
+			<div style="flex:1"><p>${{item.product.price}}</p></div>
+			<div style="flex:1"><p>x{{item.quantity}}</p></div>
+		</div>
+		{% endfor %}
+		<h5>Items:   {{order.get_cart_items}}</h5>
+		<h5>Total:   ${{order.get_cart_total}}</h5>
+		</div>
 		</div>
 	</div>
-</div>
+
+<script type="text/javascript">
+	var shipping = '{{order.shipping}}'
+	var total = '{{order.get_cart_total}}'
+	var name = '{{order.get_customer}}'
+	var email = '{{order.get_customer.email}}'
+
+	if(shipping == 'False'){
+		document.getElementById('shipping-info').innerHTML = ''
+	}
+	if(user !== 'AnonymousUser') {
+		document.getElementById('user-info').innerHTML = ''
+	}
+	if(shipping == 'False' && user !== 'AnonymousUser') {
+		//Hide entire form if user is logged in and shipping is not required because the item is a digital item
+		document.getElementById('shipping-info').classList.add('hidden');
+		//Hide Form Button when the user is logged in and no shipping info is needed
+		document.getElementById('form-button').classList.add('hidden')
+		//Show payment if the user is logged in and does not require shipping
+		document.getElementById('payment-info').classList.remove('hidden');
+	}
+
+	var form = document.getElementById('form')
+	form.addEventListener('submit', function (e){
+		e.preventDefault()
+		console.log('Form Submitted...')
+		document.getElementById('form-button').classList.add('hidden');
+		document.getElementById('payment-info').classList.remove('hidden');
+	})
+
+	document.getElementById('make-payment').addEventListener('click',
+			function (e) {
+				submitFormData()
+			})
+	function submitFormData(){
+		console.log('Payment Button Clicked')
+		var	userFormData = {
+			'name': name,
+			'email': email,
+			'total': total,
+		}
+		var shippingInfo = {
+			'address': 'address',
+			'city': 'city',
+			'state': 'state',
+			'zipcode': 'zipcode',
+		}
+		if(shipping != 'False'){
+			shippingInfo.address = form.address.value
+			shippingInfo.city = form.city.value
+			shippingInfo.state = form.state.value
+			shippingInfo.zipcode = form.zipcode.value
+		}
+		if(user === 'AnonymousUser'){
+			userFormData.name = form.name.value
+			userFormData.email = form.email.value
+		}
+
+		var url = '/process_order/'
+		fetch(url, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': csrftoken,
+			},
+			body: JSON.stringify({'form':shippingInfo, 'form':userFormData})
+		})
+
+		.then((response)=>response.json())
+				.then((data)=>{
+					console.log('Success:', data);
+					alert('Transaction Complete');
+					window.location.href = "{% url 'store' %}"
+				})
+		console.log('shipping Info', shippingInfo)
+		console.log('User Info', userFormData)
+	}
+
+</script>
+
+
 {% endblock content %}
 
 
+</div>
