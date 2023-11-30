@@ -3,21 +3,15 @@ from django.http import JsonResponse
 import json
 import datetime
 from .models import *
-from .utils import cookieCart
+from .utils import cookieCart, cartData, guestOrder
 
 
 # Create your views here.
 def cart(request):
-    if request.user.is_authenticated:
-        customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, complete=False)
-        items = order.orderitem_set.all()
-        cartItems = order.get_cart_items
-    else:
-        cookieData = cookieCart(request)
-        cartItems = cookieData['cartItems']
-        order = cookieData['order']
-        items = cookieData['items']
+    data = cartData(request)
+    items = data['items']
+    order = data['order']
+    cartItems = data['cartItems']
 
     context = {'items': items, "order": order, 'cartItems': cartItems}
     return render(request, 'cart.html', context)
@@ -25,30 +19,19 @@ def cart(request):
 
 
 def checkout(request):
-    if request.user.is_authenticated:
-        customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, complete=False)
-        items = order.orderitem_set.all()
-        cartItems = order.get_cart_items
-    else:
-        cookieData = cookieCart(request)
-        cartItems = cookieData['cartItems']
-        order = cookieData['order']
-        items = cookieData['items']
+    data = cartData(request)
+    items = data['items']
+    order = data['order']
+    cartItems = data['cartItems']
     context = {'items': items, "order": order, 'cartItems': cartItems}
     return render(request, 'checkout.html', context)
 
 
 def store(request):
-    if request.user.is_authenticated:
-        customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, complete=False)
-        items = order.orderitem_set.all()
-        cartItems = order.get_cart_items
-    else:
-        cookieData = cookieCart(request)
-        cartItems = cookieData['cartItems']
-        items = cookieData['items']
+    data = cartData(request)
+    items = data['items']
+    # order = data['order']
+    cartItems = data['cartItems']
     products = Product.objects.all()
     context = {'products': products, 'cartItems': cartItems, 'items': items}
     return render(request, 'store.html', context)
@@ -97,12 +80,34 @@ def processOrder(request):
             ShippingAddress.objects.create(
                 customer=customer,
                 order=order,
-                # address=data['shipping']['address'],
-                # city=data['shipping']['city'],
-                # state=data['shipping']['state'],
-                # zip_code=data['shipping']['zip_code'],
+                address=data['form']['address'],
+                city=data['form']['city'],
+                state=data['form']['state'],
+                zip_code=data['form']['zip_code'],
             )
     else:
-        print('User is not logged in...')
+        customer, order = guestOrder(request, data)
 
+    Total = data['form']['total']
+    order.transaction_id = transaction_id
+
+    if Total == order.get_cart_total:
+        order.complete = True
+    order.save()
+
+    if order.shipping:
+        ShippingAddress.objects.create(
+            customer=customer,
+            order=order,
+            address=data['form']['address'],
+            city=data['form']['city'],
+            state=data['form']['state'],
+            zip_code=data['form']['zip_code'],
+        )
+    # send_mail(
+    #     'Order Received',
+    #     'Your order with ID;' 'transaction_id' 'has been received',
+    #     'sales@riboto.com',
+    #     customer,
+    #           )
     return JsonResponse('The order was received and Payment Complete', safe=False)
