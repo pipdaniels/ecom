@@ -57,3 +57,8 @@ function updateUserOrder(productId, action){
             location.reload()
         })
 }
+
+$('.carousel').carousel({
+  interval: 2000
+})
+
