@@ -4,6 +4,7 @@ import json
 import datetime
 from .models import *
 from .utils import cookieCart, cartData, guestOrder
+from django.core.mail import send_mail
 
 
 # Create your views here.
@@ -106,8 +107,8 @@ def processOrder(request):
         )
     # send_mail(
     #     'Order Received',
-    #     'Your order with ID;' 'transaction_id' 'has been received',
+    #     'Your order with ID;' transaction_id 'has been received',
     #     'sales@riboto.com',
     #     customer,
-    #           )
+    #           ):
     return JsonResponse('The order was received and Payment Complete', safe=False)
