@@ -1,3 +1,5 @@
+import secrets
+
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -7,6 +9,7 @@ class Customer(models.Model):
     user = models.OneToOneField(User, blank=False, null=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     email = models.EmailField()
+
 
     class Meta:
         ordering = ['name']
@@ -47,6 +50,8 @@ class Order(models.Model):
     time_of_order = models.DateTimeField(auto_now_add=True)
     complete = models.BooleanField(default=False)
     transaction_id = models.CharField(max_length=200, null=True)
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    # quantity = models.ForeignKey(OrderItem, on_delete=models.SET_NULL, null=True)
 
     class Meta:
         ordering = ['-time_of_order']
@@ -93,11 +98,12 @@ class OrderItem(models.Model):
 class ShippingAddress(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
-    address = models.CharField(max_length=200, null=False)
-    city = models.CharField(max_length=200, null=False)
-    state = models.CharField(max_length=200, null=False)
+    address = models.CharField(max_length=1000, null=False)
+    city = models.CharField(max_length=1000, null=False)
+    state = models.CharField(max_length=1000, null=False)
     zip_code = models.CharField(max_length=200, null=False)
     date_added = models.DateTimeField(auto_now_add=True)
+    phone = models.CharField(max_length=15, null=True)
 
     def __str__(self):
         return self.address
@@ -105,3 +111,27 @@ class ShippingAddress(models.Model):
     class Meta:
         verbose_name_plural = 'Shipping Address'
         ordering = ['-date_added']
+
+
+class Payment(models.Model):
+    amount = models.PositiveIntegerField()
+    ref = models.CharField(max_length=200)
+    verified = models.BooleanField(default=False)
+    email = models.EmailField()
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-date_created']
+
+    def __str__(self):
+        return self.amount
+
+    def save(self, *args, **kwargs):
+        while not self.ref:
+            ref = secrets.token_urlsafe(50)
+            object_with_similar_reference = Payment.objects.filter(ref=ref)
+            if not object_with_similar_reference:
+                self.ref = ref
+        super().save(*args, **kwargs)
+
+

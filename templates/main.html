@@ -1,55 +1,61 @@
 {% load static %}
-<link rel="stylesheet" type="text/css" href="{% static 'css/main.css'%}">
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<head>
+  <link rel="stylesheet" type="text/css" href="{% static 'css/main.css'%}">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="icon" href="static/Assets/Favicon-32x32.svg">
+  <title>Riboto</title>
+  <meta   name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1" />
 
-<title>Ecom</title>
-<meta   name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1" />
-<script type="text/javascript">
-    var user='{{request.user}}'
-    function getCookie(name) {
-                var cookieValue = null;
-                if (document.cookie && document.cookie !== '') {
-                    const cookies = document.cookie.split(';');
-                    for (var i = 0; i < cookies.length; i++) {
-                        var cookie = cookies[i].trim();
-                        // Does this cookie string begin with the name we want?
-                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                            break;
-                        }
-                    }
-                }
-                return cookieValue;
-            }
-    var csrftoken = getCookie('csrftoken');
+  <script type="text/javascript">
+      var user='{{request.user}}'
+      function getCookie(name) {
+                  var cookieValue = null;
+                  if (document.cookie && document.cookie !== '') {
+                      const cookies = document.cookie.split(';');
+                      for (var i = 0; i < cookies.length; i++) {
+                          var cookie = cookies[i].trim();
+                          // Does this cookie string begin with the name we want?
+                          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                              break;
+                          }
+                      }
+                  }
+                  return cookieValue;
+              }
+      var csrftoken = getCookie('csrftoken');
 
-    function getCookies(name){
-        //Split cookie value pair and split the key, value pairs int dictionary
-        var cookieArr = document.cookie.split(';')
+      function getCookies(name){
+          //Split cookie value pair and split the key, value pairs int dictionary
+          var cookieArr = document.cookie.split(';')
 
-        //Loop through the array elements
-        for (var i = 0; i < cookieArr.length; i++) {
-            var cookiePair = cookieArr[i].split('=');
-            /*Removing whitespace at the beginning of the cookie name and compare it with the cookie string*/
-            if (name == cookiePair[0].trim()){
-                //Decode the cookie value and return
-                return decodeURIComponent(cookiePair[1]);
-            }
-        }
-        //Return null, if not found
-        return null;
-    }
-    var cart = JSON.parse(getCookies('cart'))
-    if (cart == undefined){
-        cart = {}
-        console.log('Cart was Created!')
-        document.cookie = 'cart' + JSON.stringify(cart) + ';domains;path=/'
-    }
-    console.log('Cart:', cart)
-</script>
+          //Loop through the array elements
+          for (var i = 0; i < cookieArr.length; i++) {
+              var cookiePair = cookieArr[i].split('=');
+              /*Removing whitespace at the beginning of the cookie name and compare it with the cookie string*/
+              if (name == cookiePair[0].trim()){
+                  //Decode the cookie value and return
+                  return decodeURIComponent(cookiePair[1]);
+              }
+          }
+          //Return null, if not found
+          return null;
+      }
+      var cart = JSON.parse(getCookies('cart'))
+      if (cart == undefined){
+          cart = {}
+          console.log('Cart was Created!')
+          document.cookie = 'cart' + JSON.stringify(cart) + ';domains;path=/'
+      }
+      console.log('Cart:', cart)
+  </script>
+</head>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <a class="navbar-brand" href="{% url 'store' %}">Ecom</a>
+  <a class="navbar-brand" href="{% url 'store' %}">
+    <img src="{% static 'Assets/main-logo-white-transparent.svg' %}" width="180" height="150" alt="Riboto Logo">
+  </a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -61,8 +67,8 @@
       </li>
 
     </ul>
-    <div class="form-inline my-2 my-lg-0">
-     	<a href="#"class="btn btn-warning">Login</a>
+<!--    <div class="form-inline my-2 my-lg-0">-->
+<!--     	<a href="#"class="btn btn-warning">Login</a>-->
 <br>
      	<a href="{% url 'cart' %}">
     		<img  id="cart-icon" src="{% static 'images/6+cart.png' %}" >
@@ -81,7 +87,51 @@
     <br>
     <br>
 {% endblock %}
+
+<div class="container">
+  <footer class="row row-cols-5 py-5 my-5 border-top">
+    <div class="col">
+      <a href="/" class="d-flex align-items-center mb-3 link-dark text-decoration-none">
+        <img src="{% static 'Assets/main-logo-black.svg' %}" width="180" height="150" alt="Riboto Logo">
+      </a>
+        <p class="text-muted">&copy; 2023</p>
+    </div>
+
+    <div class="col">
+
+    </div>
+    <div class="col">
+      <h5>Shortcut</h5>
+      <ul class="nav flex-column">
+        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Home</a></li>
+        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Pricing Policy</a></li>
+        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Privacy Policy</a></li>
+        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">FAQs</a></li>
+        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">About</a></li>
+      </ul>
+    </div>
+
+    <div class="col">
+      <h5>Categories</h5>
+      <ul class="nav flex-column">
+        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Red Wine</a></li>
+        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">White Wine</a></li>
+        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Juice</a></li>
+        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Malt</a></li>
+        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Water</a></li>
+      </ul>
+    </div>
+
+    <div class="d-flex justify-content-between py-4 my-4 border-top">
+      <ul class="list-unstyled d-flex">
+        <centred><a href="instagram/riboto.com"><img src="{% static 'Assets/instagram.png' %}" width="24" height="24" alt="instagram logo"></a></centred>
+      </ul>
+    </div>
+  </footer>
 </div>
+
+</div>
+
 
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
 
