@@ -18,9 +18,10 @@ function addCookieItem(productId, action){
     console .log('You are not a logged in User . . .')
 
     if (action == 'add'){
-        if (cart[productId] == undefined){
+        if (cart [productId] === undefined){
             cart[productId] = {'quantity': 1}
-        }else{
+            }
+        else{
             cart[productId]['quantity'] += 1
         }
     }

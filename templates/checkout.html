@@ -22,6 +22,9 @@
 			<input class="form-control" type="text" name="address" placeholder="Address..">
 		</div>
 		<div class="form-field">
+			<input class="form-control" type="text" name="phone-number" placeholder="Phone Number..">
+		</div>
+		<div class="form-field">
 			<input class="form-control" type="text" name="city" placeholder="City..">
 		</div>
 		<div class="form-field">
@@ -109,9 +112,11 @@
 			'city': 'city',
 			'state': 'state',
 			'zipcode': 'zipcode',
+			'phone-number': 'phone',
 		}
 		if(shipping != 'False'){
 			shippingInfo.address = form.address.value
+			// shippingInfo.phone = form.phone.value
 			shippingInfo.city = form.city.value
 			shippingInfo.state = form.state.value
 			shippingInfo.zipcode = form.zipcode.value

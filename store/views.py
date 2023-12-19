@@ -3,8 +3,9 @@ from django.http import JsonResponse
 import json
 import datetime
 from .models import *
-from .utils import cookieCart, cartData, guestOrder
-from django.core.mail import send_mail
+from .utils import cookieCart, cartData, guestOrder, notification_message
+
+
 
 
 # Create your views here.
@@ -16,7 +17,6 @@ def cart(request):
 
     context = {'items': items, "order": order, 'cartItems': cartItems}
     return render(request, 'cart.html', context)
-
 
 
 def checkout(request):
@@ -50,9 +50,9 @@ def update_item(request):
     orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
 
     if action == 'add':
-        orderItem.quantity = (orderItem.quantity +1)
+        orderItem.quantity = (orderItem.quantity + 1)
     elif action == 'remove':
-        orderItem.quantity = (orderItem.quantity -1)
+        orderItem.quantity = (orderItem.quantity - 1)
 
     orderItem.save()
 
@@ -63,52 +63,87 @@ def update_item(request):
 
 
 def processOrder(request):
+    # Print the data received in the request body
     print('Data:', request.body)
+
+    # Generate a unique transaction_id using the current timestamp
     transaction_id = datetime.datetime.now().timestamp()
+
+    # Parse the JSON data from the request body
     data = json.loads(request.body)
 
+    # Check if the user is authenticated
     if request.user.is_authenticated:
+        # If authenticated, get the customer associated with the user
         customer = request.user.customer
+
+        # Get or create an order for the customer that is not complete
         order, created = Order.objects.get_or_create(customer=customer, complete=False)
+
+        # Extract total from the form data
         Total = data['form']['total']
+
+        # Set the transaction_id for the order
         order.transaction_id = transaction_id
 
+        # Check if the total matches the cart total
         if Total == order.get_cart_total:
             order.complete = True
+
+        # Save the order
         order.save()
 
+        # If the order has a shipping address, create a ShippingAddress object
         if order.shipping:
+            try:
+                ShippingAddress.objects.create(
+                    customer=customer,
+                    order=order,
+                    address=data['shipping']['address'],
+                    city=data['shipping']['city'],
+                    state=data['shipping']['state'],
+                    zip_code=data['shipping']['zip_code'],
+                    phone=data['shipping']['phone']
+                    )
+            except Exception as e:
+                print(f"Error saving shipping address: {e}")
+
+            finally:
+                ShippingAddress.save()
+    else:
+        # If the user is not authenticated, use a guestOrder function to get customer and order
+        customer, order = guestOrder(request, data)
+
+    # Reassign Total from the form data
+    Total = data['form']['total']
+
+    # Set the transaction_id for the order
+    order.transaction_id = transaction_id
+
+    # Check if the total matches the cart total
+    if Total == order.get_cart_total:
+        order.complete = True
+
+    # Save the order
+    order.save()
+
+    # If the order has a shipping address, create a ShippingAddress object
+    if order.shipping:
+        try:
             ShippingAddress.objects.create(
                 customer=customer,
                 order=order,
-                address=data['form']['address'],
-                city=data['form']['city'],
-                state=data['form']['state'],
-                zip_code=data['form']['zip_code'],
-            )
-    else:
-        customer, order = guestOrder(request, data)
+                address=data['shipping']['address'],
+                city=data['shipping']['city'],
+                state=data['shipping']['state'],
+                zip_code=data['shipping']['zip_code'],
+                phone=data['shipping']['phone']
+                )
+        except Exception as e:
+            print(f"Error saving shipping address: {e}")
 
-    Total = data['form']['total']
-    order.transaction_id = transaction_id
+        finally:
+            ShippingAddress.save()
 
-    if Total == order.get_cart_total:
-        order.complete = True
-    order.save()
-
-    if order.shipping:
-        ShippingAddress.objects.create(
-            customer=customer,
-            order=order,
-            address=data['form']['address'],
-            city=data['form']['city'],
-            state=data['form']['state'],
-            zip_code=data['form']['zip_code'],
-        )
-    # send_mail(
-    #     'Order Received',
-    #     'Your order with ID;' transaction_id 'has been received',
-    #     'sales@riboto.com',
-    #     customer,
-    #           ):
+    # Return a JsonResponse indicating that the order was received and payment is complete
     return JsonResponse('The order was received and Payment Complete', safe=False)

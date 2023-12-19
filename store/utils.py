@@ -1,6 +1,7 @@
 from .models import *
 import json
-
+from django.core.mail import send_mail, mail_admins
+from store.settings import EMAIL_HOST_USER
 
 def cookieCart(request):
         try:
@@ -76,3 +77,11 @@ def guestOrder(request, data):
         orderItem = OrderItem.objects.create(product=product, order=order, quantity=item['quantity'])
 
     return customer, order
+
+subject = 'Order Received'
+message = 'Dear' + data['customer'] + 'Your order with the transaction ID: '+str(transaction_id)+ 'has been received succesfully. Expect the delivery in the shortest time possible. Thanks for shopping on Riboto!'
+EMAIL_HOST_USER
+email = data['form']['email']
+recipient_list = [email]
+send_mail(subject, message, EMAIL_HOST_USER, recipient_list, fail_silently=True)
+
