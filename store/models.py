@@ -5,17 +5,19 @@ from django.contrib.auth.models import User
 
 
 # Create your models here.
-class Customer(models.Model):
-    user = models.OneToOneField(User, blank=False, null=True, on_delete=models.CASCADE)
-    name = models.CharField(max_length=50)
-    email = models.EmailField()
-
+class Customer(User):
+    profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
+    user = models.OneToOneField(User, blank=True, null=True, on_delete=models.CASCADE, related_name='_ptr')
+    # name = models.CharField(max_length=50)
+    # email = models.EmailField()
+    phone_number = models.CharField(max_length=14, null=True)
+    # user_ptr = models.OneToOneField(User, null=True, on_delete=models.SET_NULL)
 
     class Meta:
-        ordering = ['name']
+        ordering = ['-date_joined']
 
     def __str__(self):
-        return self.name
+        return self.username
 
 
 class Category(models.Model):
@@ -46,11 +48,12 @@ class Product(models.Model):
 
 
 class Order(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
+    customer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     time_of_order = models.DateTimeField(auto_now_add=True)
     complete = models.BooleanField(default=False)
     transaction_id = models.CharField(max_length=200, null=True)
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+
     # quantity = models.ForeignKey(OrderItem, on_delete=models.SET_NULL, null=True)
 
     class Meta:
@@ -80,6 +83,7 @@ class Order(models.Model):
         total = sum([item.quantity for item in orderitems])
         return total
 
+
 class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
@@ -96,7 +100,7 @@ class OrderItem(models.Model):
 
 
 class ShippingAddress(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
+    customer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
     address = models.CharField(max_length=1000, null=False)
     city = models.CharField(max_length=1000, null=False)
@@ -133,5 +137,3 @@ class Payment(models.Model):
             if not object_with_similar_reference:
                 self.ref = ref
         super().save(*args, **kwargs)
-
-
