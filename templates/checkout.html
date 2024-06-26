@@ -22,6 +22,9 @@
 			<input class="form-control" type="text" name="address" placeholder="Address..">
 		</div>
 		<div class="form-field">
+			<input class="form-control" type="text" name="phone-number" placeholder="Phone Number..">
+		</div>
+		<div class="form-field">
 			<input class="form-control" type="text" name="city" placeholder="City..">
 		</div>
 		<div class="form-field">
@@ -59,7 +62,7 @@
 		</div>
 		{% endfor %}
 		<h5>Items:   {{order.get_cart_items}}</h5>
-		<h5>Total:   ${{order.get_cart_total}}</h5>
+		<h5>Total:   ₦{{order.get_cart_total}}</h5>
 		</div>
 		</div>
 	</div>
@@ -109,9 +112,11 @@
 			'city': 'city',
 			'state': 'state',
 			'zipcode': 'zipcode',
+			'phone-number': 'phone',
 		}
 		if(shipping != 'False'){
 			shippingInfo.address = form.address.value
+			// shippingInfo.phone = form.phone.value
 			shippingInfo.city = form.city.value
 			shippingInfo.state = form.state.value
 			shippingInfo.zipcode = form.zipcode.value
@@ -135,6 +140,10 @@
 				.then((data)=>{
 					console.log('Success:', data);
 					alert('Transaction Complete');
+
+					cart = {}
+					document.cookie = 'cart=' + JSON.stringify(cart) + ",domain=;path=/"
+
 					window.location.href = "{% url 'store' %}"
 				})
 		console.log('shipping Info', shippingInfo)

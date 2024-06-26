@@ -1,0 +1,19 @@
+{% extends 'main.html' %}
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+{% load crispy_forms_tags %}
+
+{% block content %}
+<form method="POST">
+    <h3>Login</h3>
+{% csrf_token %}
+{{form|crispy}}
+
+    <p>You don't have an account yet? <a href="/sign-up">Sign Up Here</a></p>
+    <p>Forgot Password? <a href="/password_reset">Reset Password</a></p>
+    <button type="submit" class="btn btn-success">Login</button>
+</form>
+{%endblock content %}

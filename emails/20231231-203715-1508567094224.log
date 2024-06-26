@@ -1,0 +1,25 @@
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Password reset on localhost:8000
+From: webmaster@localhost
+To: deluxehay1@gmail.com
+Date: Sun, 31 Dec 2023 19:37:15 -0000
+Message-ID: <170405143541.12728.4124107991664086938@SeunYusuf>
+
+
+You're receiving this email because you requested a password reset for your user account at localhost:8000.
+
+Please go to the following page and choose a new password:
+
+http://localhost:8000/reset/Mg/c03am3-687d58a34634e79ab4aa8f68f9cb5923/
+
+Your username, in case you’ve forgotten: smakinde
+
+Thanks for using our site!
+
+The localhost:8000 team
+
+
+
+-------------------------------------------------------------------------------
